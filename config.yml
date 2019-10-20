@@ -1,0 +1,31 @@
+version: 0.0.1
+
+# Change default server ports
+server:
+  applicationConnectors:
+    - type: http
+      port: 9000
+  adminConnectors:
+    - type: http
+      port: 9001
+cassandra:
+  type: basic
+  name: cassandra.test-cluster
+  clusterName: test-cluster
+  contactPoints:
+    - localhost
+  connectionString: localhost
+  port: 9042
+  loadBalancingPolicy:
+    type: roundRobin
+health:
+  delayedShutdownHandlerEnabled: true
+  shutdownWaitPeriod: 5s
+  healthChecks:
+    - name: cassandra.test-cluster
+      critical: true
+      schedule:
+        checkInterval: 2500ms
+        downtimeInterval: 10s
+        failureAttempts: 2
+        successAttempts: 1
