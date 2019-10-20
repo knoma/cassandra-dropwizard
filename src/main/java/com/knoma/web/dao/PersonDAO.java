@@ -18,10 +18,10 @@ public interface PersonDAO {
     @Insert
     void save(Person person);
 
-    @Query("DELETE FROM cass_drop.person WHERE id = :id")
+    @Query("DELETE FROM cass_drop.person WHERE id = :id;")
     void delete(UUID id);
 
-    @Query("SELECT count(*) FROM cass_drop.person;")
+    @Query("SELECT count(id) FROM cass_drop.person;")
     Long getCount();
 
     @Query("SELECT * FROM cass_drop.person;")
