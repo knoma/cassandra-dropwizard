@@ -8,21 +8,11 @@ server:
   adminConnectors:
     - type: http
       port: 9001
-cassandra:
-  type: basic
-  name: cassandra.test-cluster
-  clusterName: test-cluster
-  contactPoints:
-    - localhost
-  connectionString: localhost
-  port: 9042
-  loadBalancingPolicy:
-    type: roundRobin
 health:
   delayedShutdownHandlerEnabled: true
   shutdownWaitPeriod: 5s
   healthChecks:
-    - name: cassandra.test-cluster
+    - name: cassandra
       critical: true
       schedule:
         checkInterval: 2500ms

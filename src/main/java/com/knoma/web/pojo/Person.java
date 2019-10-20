@@ -1,26 +1,17 @@
 package com.knoma.web.pojo;
 
-import com.datastax.driver.mapping.annotations.Column;
-import com.datastax.driver.mapping.annotations.PartitionKey;
-import com.datastax.driver.mapping.annotations.Table;
+import com.datastax.oss.driver.api.mapper.annotations.Entity;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
-@Table(keyspace = "cass_drop", name = "person",
-        readConsistency = "QUORUM",
-        writeConsistency = "QUORUM",
-        caseSensitiveKeyspace = false,
-        caseSensitiveTable = false)
+@Entity
 public class Person {
 
     @PartitionKey
     private UUID id;
-
-    @Column(name = "first_name")
     private String firstName;
-
-    @Column(name = "last_name")
     private String lastName;
     private String email;
 
@@ -34,13 +25,25 @@ public class Person {
         this.email = email;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @JsonProperty
     public UUID getId() {
         return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     @JsonProperty
@@ -48,25 +51,13 @@ public class Person {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     @JsonProperty
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     @JsonProperty
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

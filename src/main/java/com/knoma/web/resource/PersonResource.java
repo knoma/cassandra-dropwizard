@@ -1,10 +1,12 @@
 package com.knoma.web.resource;
 
-import com.knoma.web.dao.PersonAccessor;
 import com.codahale.metrics.annotation.Timed;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.mapping.MappingManager;
+import com.datastax.oss.driver.api.core.CqlIdentifier;
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.google.common.collect.ImmutableMap;
+import com.knoma.web.dao.PersonDAO;
+import com.knoma.web.dao.PersonMapper;
+import com.knoma.web.dao.PersonMapperBuilder;
 import com.knoma.web.pojo.Person;
 
 import javax.ws.rs.*;
@@ -16,32 +18,28 @@ import java.util.UUID;
 @Path("/person")
 public class PersonResource {
 
-    private Session session;
-    private PersonAccessor personAccessor;
+    private PersonDAO personDAO;
 
-    public PersonResource(Session session) {
-        this.session = session;
-
-        MappingManager manager = new MappingManager(session);
-        this.personAccessor = manager.createAccessor(PersonAccessor.class);
+    public PersonResource(CqlSession session) {
+        PersonMapper personMapper = new PersonMapperBuilder(session).build();
+        this.personDAO = personMapper.personDao(CqlIdentifier.fromCql("cass_drop"));
     }
 
     @GET
     @Timed
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Person getPerson(@PathParam("id") String id) {
-        System.out.println(personAccessor.getCount().one().getLong(0));
-        return personAccessor.getById(UUID.fromString(id)).one();
+    public Person getPerson(@PathParam("id") UUID id) {
+        return personDAO.getById(id);
     }
 
     @DELETE
     @Timed
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Long>  removePerson(@PathParam("id") String id) {
-        personAccessor.delete(UUID.fromString(id));
-        return ImmutableMap.of("count", personAccessor.getCount().one().getLong(0));
+    public Map<String, Long> removePerson(@PathParam("id") String id) {
+        personDAO.delete(UUID.fromString(id));
+        return ImmutableMap.of("count", personDAO.getCount());
     }
 
     @GET
@@ -49,7 +47,7 @@ public class PersonResource {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Person> getPersons() {
-        return personAccessor.getAll().all();
+        return personDAO.getAll().all();
     }
 
     @GET
@@ -57,7 +55,7 @@ public class PersonResource {
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Long> getPersonCount() {
-        return ImmutableMap.of("count", personAccessor.getCount().one().getLong(0));
+        return ImmutableMap.of("count", personDAO.getCount());
     }
 
     @POST
@@ -66,7 +64,7 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes({MediaType.APPLICATION_JSON})
     public Person addPerson(Person person) {
-        personAccessor.save(person.getId(), person.getFirstName(), person.getLastName(), person.getEmail());
+        personDAO.save(person);
         return person;
     }
 }
