@@ -6,4 +6,4 @@ services:
 before_script:
   - bash travis/setup_cassandra.sh
 sudo: required
-dist: trusty
+#dist: trusty
