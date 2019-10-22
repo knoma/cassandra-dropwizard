@@ -14,4 +14,4 @@ function cassandra_ready() {
 }
 
 cassandra_ready
-cqlsh -f src/main/resources/cql/db.cql
+cqlsh -f ../src/main/resources/cql/db.cql
