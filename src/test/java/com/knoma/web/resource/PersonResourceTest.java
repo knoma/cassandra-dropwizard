@@ -18,8 +18,6 @@ import static org.junit.Assert.assertThat;
 
 public class PersonResourceTest {
 
-
-
     private static final String CONFIG_PATH = "config.yml";
     private static final String HOST = "localhost";
     private static final String APP_PORT_KEY = "server.applicationConnectors[0].port";
@@ -33,7 +31,6 @@ public class PersonResourceTest {
 
     @Test
     public void createPersonSuccess() throws Exception {
-
         Person person = new Person(UUID.randomUUID(), "testJ", "testJ", "testj@testj.com");
         ResponseOptions getRes =
                 given()
