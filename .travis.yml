@@ -3,3 +3,5 @@ jdk:
   - openjdk8
 services:
   - cassandra
+before_script:
+  - bash travis/setup_cassandra.sh
