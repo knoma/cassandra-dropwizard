@@ -26,9 +26,7 @@ public class WebApp extends Application<WebConfig> {
         CqlSession session = CqlSession.builder().build();
 
         env.lifecycle().manage(new CassandraManager(session, io.dropwizard.util.Duration.milliseconds(1000)));
-
-        final PersonResource personResource = new PersonResource(session);
-        env.jersey().register(personResource);
+        env.jersey().register(new PersonResource(session));
 
         final CassandraHealthCheck healthCheck = new CassandraHealthCheck(session, validationQuery, io.dropwizard.util.Duration.milliseconds(1000));
         env.healthChecks().register("cassandra", healthCheck);

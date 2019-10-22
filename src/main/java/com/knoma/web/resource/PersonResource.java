@@ -33,7 +33,12 @@ public class PersonResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public void getPerson(@Suspended final AsyncResponse response, @PathParam("id") UUID id) {
-         response.resume(Response.status(Response.Status.OK).entity(personDAO.getById(id)).build());
+        Person byId = personDAO.getById(id);
+        if (byId != null) {
+            response.resume(Response.status(Response.Status.OK).entity(byId).build());
+        } else {
+            response.resume(Response.status(Response.Status.NOT_FOUND).build());
+        }
     }
 
     @DELETE

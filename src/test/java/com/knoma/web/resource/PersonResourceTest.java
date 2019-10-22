@@ -77,4 +77,19 @@ public class PersonResourceTest {
         Person result = getRes.getBody().as(Person.class);
         assertThat(result, equalTo(person));
     }
+
+
+    @Test
+    public void getPersonNotFound() throws Exception {
+        ResponseOptions getRes =
+                given()
+                        .log().all()
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
+                        .when()
+                        .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/" + UUID.randomUUID());
+
+        Validatable validatableResponse = (Validatable) getRes;
+        validatableResponse.then().log().all().statusCode(404);
+    }
 }
