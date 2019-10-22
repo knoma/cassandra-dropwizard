@@ -1,5 +1,6 @@
+[![Build Status](https://travis-ci.com/knoma/cass-dropwizard.svg?branch=Cassandra4)](https://travis-ci.com/knoma/cass-dropwizard)
 # REST Webservice using Dropwizard and Cassandra
-Simple REST Webservice using Dropwizard 2.0 and Cassandra Driver
+Simple REST Webservice using Dropwizard 2.0 and Cassandra Driver 4.2
 
 ###Requirements 
  - Cassandra 
