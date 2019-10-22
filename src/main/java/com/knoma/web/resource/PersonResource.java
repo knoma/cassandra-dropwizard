@@ -8,11 +8,13 @@ import com.knoma.web.dao.PersonDAO;
 import com.knoma.web.dao.PersonMapper;
 import com.knoma.web.dao.PersonMapperBuilder;
 import com.knoma.web.pojo.Person;
+import org.glassfish.jersey.server.ManagedAsync;
 
 import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
-import java.util.Map;
+import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 @Path("/person")
@@ -27,44 +29,49 @@ public class PersonResource {
 
     @GET
     @Timed
+    @ManagedAsync
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Person getPerson(@PathParam("id") UUID id) {
-        return personDAO.getById(id);
+    public void getPerson(@Suspended final AsyncResponse response, @PathParam("id") UUID id) {
+         response.resume(Response.status(Response.Status.OK).entity(personDAO.getById(id)).build());
     }
 
     @DELETE
     @Timed
+    @ManagedAsync
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Long> removePerson(@PathParam("id") String id) {
+    public void removePerson(@Suspended final AsyncResponse response, @PathParam("id") String id) {
         personDAO.delete(UUID.fromString(id));
-        return ImmutableMap.of("count", personDAO.getCount());
+        response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", personDAO.getCount())).build());
     }
 
     @GET
     @Timed
+    @ManagedAsync
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Person> getPersons() {
-        return personDAO.getAll().all();
-    }
-
-    @GET
-    @Timed
-    @Path("/count")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Long> getPersonCount() {
-        return ImmutableMap.of("count", personDAO.getCount());
+    public void getPersons(@Suspended final AsyncResponse response) {
+        response.resume(Response.status(Response.Status.OK).entity(personDAO.getAll().all()).build());
     }
 
     @POST
     @Timed
+    @ManagedAsync
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes({MediaType.APPLICATION_JSON})
-    public Person addPerson(Person person) {
+    public void addPerson(@Suspended final AsyncResponse response, Person person) {
         personDAO.save(person);
-        return person;
+        response.resume(Response.status(Response.Status.CREATED).entity(person).build());
+    }
+
+    @GET
+    @Timed
+    @ManagedAsync
+    @Path("/count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getPersonCount(@Suspended final AsyncResponse response) {
+        response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", personDAO.getCount())).build());
     }
 }

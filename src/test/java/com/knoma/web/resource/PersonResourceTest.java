@@ -42,6 +42,36 @@ public class PersonResourceTest {
                         .post("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
 
         Validatable validatableResponse = (Validatable) getRes;
+        validatableResponse.then().log().all().statusCode(201);
+
+        Person result = getRes.getBody().as(Person.class);
+        assertThat(result, equalTo(person));
+    }
+
+    @Test
+    public void getPersonSuccess() throws Exception {
+        Person person = new Person(UUID.randomUUID(), "testJ", "testJ", "testj@testj.com");
+        ResponseOptions getRes =
+                given()
+                        .log().all()
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
+                        .when()
+                        .body(person)
+                        .post("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+
+        Validatable validatableResponse = (Validatable) getRes;
+        validatableResponse.then().log().all().statusCode(201);
+
+        getRes =
+                given()
+                        .log().all()
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
+                        .when()
+                        .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/"+ person.getId());
+
+        validatableResponse = (Validatable) getRes;
         validatableResponse.then().log().all().statusCode(200);
 
         Person result = getRes.getBody().as(Person.class);
