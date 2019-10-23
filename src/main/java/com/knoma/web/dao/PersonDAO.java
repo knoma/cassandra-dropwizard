@@ -1,6 +1,6 @@
 package com.knoma.web.dao;
 
-import com.datastax.oss.driver.api.core.PagingIterable;
+import com.datastax.oss.driver.api.core.MappedAsyncPagingIterable;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
 import com.datastax.oss.driver.api.mapper.annotations.Insert;
 import com.datastax.oss.driver.api.mapper.annotations.Query;
@@ -8,12 +8,13 @@ import com.datastax.oss.driver.api.mapper.annotations.Select;
 import com.knoma.web.pojo.Person;
 
 import java.util.UUID;
+import java.util.concurrent.CompletionStage;
 
 @Dao
 public interface PersonDAO {
 
     @Select
-    Person getById(UUID personId);
+    CompletionStage<Person> getById(UUID personId);
 
     @Insert
     void save(Person person);
@@ -22,8 +23,8 @@ public interface PersonDAO {
     void delete(UUID id);
 
     @Query("SELECT count(id) FROM cass_drop.person;")
-    Long getCount();
+    CompletionStage<Long> getCount();
 
     @Query("SELECT * FROM cass_drop.person;")
-    PagingIterable<Person> getAll();
+    CompletionStage<MappedAsyncPagingIterable<Person>> getAll();
 }

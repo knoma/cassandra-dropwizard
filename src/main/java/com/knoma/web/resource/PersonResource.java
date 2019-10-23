@@ -16,6 +16,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @Path("/person")
 public class PersonResource {
@@ -32,13 +33,14 @@ public class PersonResource {
     @ManagedAsync
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void getPerson(@Suspended final AsyncResponse response, @PathParam("id") UUID id) {
-        Person byId = personDAO.getById(id);
-        if (byId != null) {
-            response.resume(Response.status(Response.Status.OK).entity(byId).build());
-        } else {
-            response.resume(Response.status(Response.Status.NOT_FOUND).build());
-        }
+    public void getPerson(@Suspended final AsyncResponse response, @PathParam("id") UUID id) throws ExecutionException, InterruptedException {
+        personDAO.getById(id).whenCompleteAsync((res, error) -> {
+            if (res != null) {
+                response.resume(Response.status(Response.Status.OK).entity(res).build());
+            } else {
+                response.resume(Response.status(Response.Status.NOT_FOUND).build());
+            }
+        });
     }
 
     @DELETE
@@ -48,7 +50,8 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     public void removePerson(@Suspended final AsyncResponse response, @PathParam("id") String id) {
         personDAO.delete(UUID.fromString(id));
-        response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", personDAO.getCount())).build());
+        personDAO.getCount().whenCompleteAsync((res, err) ->
+                response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", res)).build()));
     }
 
     @GET
@@ -57,7 +60,8 @@ public class PersonResource {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public void getPersons(@Suspended final AsyncResponse response) {
-        response.resume(Response.status(Response.Status.OK).entity(personDAO.getAll().all()).build());
+        personDAO.getAll().whenCompleteAsync((a, throwable) ->
+                response.resume(Response.status(Response.Status.OK).entity(a.currentPage()).build()));
     }
 
     @POST
@@ -77,6 +81,7 @@ public class PersonResource {
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
     public void getPersonCount(@Suspended final AsyncResponse response) {
-        response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", personDAO.getCount())).build());
+        personDAO.getCount().whenCompleteAsync((res, err) ->
+                response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", res)).build()));
     }
 }

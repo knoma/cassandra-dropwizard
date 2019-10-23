@@ -10,10 +10,12 @@ import io.restassured.response.Validatable;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
 
 public class PersonResourceTest {
@@ -78,7 +80,6 @@ public class PersonResourceTest {
         assertThat(result, equalTo(person));
     }
 
-
     @Test
     public void getPersonNotFound() throws Exception {
         ResponseOptions getRes =
@@ -91,5 +92,65 @@ public class PersonResourceTest {
 
         Validatable validatableResponse = (Validatable) getRes;
         validatableResponse.then().log().all().statusCode(404);
+    }
+
+    @Test
+    public void getAllPersonSuccess() throws Exception {
+        Person person = new Person(UUID.randomUUID(), "testJ", "testJ", "testj@testj.com");
+        ResponseOptions getRes =
+                given()
+                        .log().all()
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
+                        .when()
+                        .body(person)
+                        .post("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+
+        Validatable validatableResponse = (Validatable) getRes;
+        validatableResponse.then().log().all().statusCode(201);
+
+        getRes =
+                given()
+                        .log().all()
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
+                        .when()
+                        .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/all");
+
+        validatableResponse = (Validatable) getRes;
+        validatableResponse.then().log().all().statusCode(200);
+
+        Person[] result = getRes.getBody().as(Person[].class);
+        assertThat(result.length, greaterThan(1));
+    }
+
+    @Test
+    public void getPersonCountSuccess() throws Exception {
+        Person person = new Person(UUID.randomUUID(), "testJ", "testJ", "testj@testj.com");
+        ResponseOptions getRes =
+                given()
+                        .log().all()
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
+                        .when()
+                        .body(person)
+                        .post("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+
+        Validatable validatableResponse = (Validatable) getRes;
+        validatableResponse.then().log().all().statusCode(201);
+
+        getRes =
+                given()
+                        .log().all()
+                        .header("Content-Type", "application/json")
+                        .header("Accept", "application/json")
+                        .when()
+                        .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/count");
+
+        validatableResponse = (Validatable) getRes;
+        validatableResponse.then().log().all().statusCode(200);
+
+        Map<String, Integer> map = getRes.getBody().as(Map.class);
+        assertThat(map.get("count"), greaterThan(1));
     }
 }
