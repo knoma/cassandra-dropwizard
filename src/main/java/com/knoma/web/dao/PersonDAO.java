@@ -17,10 +17,10 @@ public interface PersonDAO {
     CompletionStage<Person> getById(UUID personId);
 
     @Insert
-    void save(Person person);
+    CompletionStage<Void> saveAsync(Person person);
 
     @Query("DELETE FROM cass_drop.person WHERE id = :id;")
-    void delete(UUID id);
+    CompletionStage<Void> delete(UUID id);
 
     @Query("SELECT count(id) FROM cass_drop.person;")
     CompletionStage<Long> getCount();

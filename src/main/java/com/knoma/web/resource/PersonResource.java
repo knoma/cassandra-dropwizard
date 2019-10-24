@@ -34,7 +34,7 @@ public class PersonResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public void getPerson(@Suspended final AsyncResponse response, @PathParam("id") UUID id) throws ExecutionException, InterruptedException {
-        personDAO.getById(id).whenCompleteAsync((res, error) -> {
+        personDAO.getById(id).thenAccept((res) -> {
             if (res != null) {
                 response.resume(Response.status(Response.Status.OK).entity(res).build());
             } else {
@@ -50,7 +50,7 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     public void removePerson(@Suspended final AsyncResponse response, @PathParam("id") String id) {
         personDAO.delete(UUID.fromString(id));
-        personDAO.getCount().whenCompleteAsync((res, err) ->
+        personDAO.getCount().thenAccept((res) ->
                 response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", res)).build()));
     }
 
@@ -60,7 +60,7 @@ public class PersonResource {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public void getPersons(@Suspended final AsyncResponse response) {
-        personDAO.getAll().whenCompleteAsync((a, throwable) ->
+        personDAO.getAll().thenAccept((a) ->
                 response.resume(Response.status(Response.Status.OK).entity(a.currentPage()).build()));
     }
 
@@ -71,8 +71,8 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes({MediaType.APPLICATION_JSON})
     public void addPerson(@Suspended final AsyncResponse response, Person person) {
-        personDAO.save(person);
-        response.resume(Response.status(Response.Status.CREATED).entity(person).build());
+        personDAO.saveAsync(person).thenAccept(aVoid -> response.resume(Response.status(Response.Status.CREATED).entity(person).build()));
+        ;
     }
 
     @GET
