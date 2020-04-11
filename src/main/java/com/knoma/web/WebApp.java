@@ -14,11 +14,11 @@ import io.dropwizard.setup.Environment;
 
 public class WebApp extends Application<WebConfig> {
 
+    protected String validationQuery = "SELECT key FROM system.local;";
+
     public static void main(String[] args) throws Exception {
         new WebApp().run(args);
     }
-
-    protected String validationQuery = "SELECT key FROM system.local;";
 
     @Override
     public void run(WebConfig config, Environment env) {

@@ -25,7 +25,8 @@ public class CassandraManager implements Managed {
     }
 
     @Override
-    public void start() throws Exception {}
+    public void start() throws Exception {
+    }
 
     @Override
 
