@@ -10,6 +10,7 @@ import com.knoma.web.dao.PersonMapperBuilder;
 import com.knoma.web.pojo.Person;
 import org.glassfish.jersey.server.ManagedAsync;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
@@ -23,6 +24,7 @@ public class PersonResource {
 
     private PersonDAO personDAO;
 
+    @Inject
     public PersonResource(CqlSession session) {
         PersonMapper personMapper = new PersonMapperBuilder(session).build();
         this.personDAO = personMapper.personDao(CqlIdentifier.fromCql("cass_drop"));
@@ -72,7 +74,6 @@ public class PersonResource {
     @Consumes({MediaType.APPLICATION_JSON})
     public void addPerson(@Suspended final AsyncResponse response, Person person) {
         personDAO.saveAsync(person).thenAccept(aVoid -> response.resume(Response.status(Response.Status.CREATED).entity(person).build()));
-        ;
     }
 
     @GET

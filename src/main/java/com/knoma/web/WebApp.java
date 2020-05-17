@@ -11,10 +11,17 @@ import io.dropwizard.health.core.HealthCheckBundle;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.glassfish.jersey.internal.inject.AbstractBinder;
+
+import javax.inject.Singleton;
+
+import static io.dropwizard.util.Duration.milliseconds;
 
 public class WebApp extends Application<WebConfig> {
 
     protected String validationQuery = "SELECT key FROM system.local;";
+
+    private CqlSession session = CqlSession.builder().build();
 
     public static void main(String[] args) throws Exception {
         new WebApp().run(args);
@@ -23,15 +30,20 @@ public class WebApp extends Application<WebConfig> {
     @Override
     public void run(WebConfig config, Environment env) {
 
-        CqlSession session = CqlSession.builder().build();
+        env.lifecycle().manage(new CassandraManager(session, milliseconds(1000)));
+        env.jersey().register(PersonResource.class);
 
-        env.lifecycle().manage(new CassandraManager(session, io.dropwizard.util.Duration.milliseconds(1000)));
-        env.jersey().register(new PersonResource(session));
-
-        final CassandraHealthCheck healthCheck = new CassandraHealthCheck(session, validationQuery, io.dropwizard.util.Duration.milliseconds(1000));
+        final CassandraHealthCheck healthCheck = new CassandraHealthCheck(session, validationQuery, milliseconds(1000));
         env.healthChecks().register("cassandra", healthCheck);
 
         env.jersey().register(new JsonProcessingExceptionMapper(true));
+
+        env.jersey().register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(session).to(CqlSession.class);
+            }
+        });
     }
 
     @Override
