@@ -4,5 +4,8 @@ jdk:
 services:
   - cassandra
 before_script:
-  - cqlsh -f src/main/resources/cql/db.cql
+  - - cqlsh -f src/main/resources/cql/db.cql
+  - chmod +x gradlew
+script:
+  - ./gradlew clean build -i
 dist: trusty
