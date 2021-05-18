@@ -1,9 +1,9 @@
-FROM adoptopenjdk/openjdk11
+FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.11_9-slim
 
 ARG DEPLOY_HOME="/opt/app"
 
 ENV DEPLOY_HOME=$DEPLOY_HOME
-ENV APP_JVM_OPTIONS="-Xms1g -Xmx1g -XX:+DisableExplicitGC"
+ENV APP_JVM_OPTIONS="-Xms128mb -Xmx128mb -XX:+DisableExplicitGC"
 ENV APP_JAR=cass-dropwizard-rest.jar
 
 
