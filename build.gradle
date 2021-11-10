@@ -39,12 +39,12 @@ targetCompatibility = 11
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     implementation "io.dropwizard:dropwizard-core:$dropwizardVersion"
-    implementation 'io.dropwizard.modules:dropwizard-health:1.6.0'
+    implementation 'io.dropwizard.modules:dropwizard-health:1.7.1'
 
     implementation "com.datastax.oss:java-driver-core:$casandraDriverVersion"
     implementation "com.datastax.oss:java-driver-mapper-runtime:$casandraDriverVersion"
     annotationProcessor "com.datastax.oss:java-driver-mapper-processor:$casandraDriverVersion"
-    implementation 'org.lz4:lz4-java:1.7.1'
+    implementation 'org.lz4:lz4-java:1.8.0'
 
     // Use the awesome Spock testing and specification framework even with Java
     testImplementation "io.dropwizard:dropwizard-testing:$dropwizardVersion"
@@ -52,7 +52,7 @@ dependencies {
     testImplementation "io.rest-assured:rest-assured:$restAssuredVersion"
 
     // Use the latest Groovy version for Spock testing
-    testImplementation 'org.codehaus.groovy:groovy-all:3.0.8'
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.9'
 
     // Use the awesome Spock testing and specification framework even with Java
     testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
