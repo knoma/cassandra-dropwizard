@@ -6,14 +6,10 @@ import com.knoma.web.health.CassandraHealthCheck;
 import com.knoma.web.managed.CassandraManager;
 import com.knoma.web.resource.PersonResource;
 import io.dropwizard.Application;
-import io.dropwizard.health.conf.HealthConfiguration;
-import io.dropwizard.health.core.HealthCheckBundle;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
-
-import javax.inject.Singleton;
 
 import static io.dropwizard.util.Duration.milliseconds;
 
@@ -49,12 +45,5 @@ public class WebApp extends Application<WebConfig> {
     @Override
     public void initialize(Bootstrap<WebConfig> bootstrap) {
         super.initialize(bootstrap);
-
-        bootstrap.addBundle(new HealthCheckBundle<WebConfig>() {
-            @Override
-            protected HealthConfiguration getHealthConfiguration(final WebConfig configuration) {
-                return configuration.getHealthConfiguration();
-            }
-        });
     }
 }
