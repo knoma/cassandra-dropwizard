@@ -8,14 +8,15 @@ import com.knoma.web.dao.PersonDAO;
 import com.knoma.web.dao.PersonMapper;
 import com.knoma.web.dao.PersonMapperBuilder;
 import com.knoma.web.pojo.Person;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.server.ManagedAsync;
 
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 

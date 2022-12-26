@@ -5,10 +5,11 @@ import com.knoma.web.config.WebConfig;
 import com.knoma.web.health.CassandraHealthCheck;
 import com.knoma.web.managed.CassandraManager;
 import com.knoma.web.resource.PersonResource;
-import io.dropwizard.Application;
+import io.dropwizard.core.Application;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
+
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 
 import static io.dropwizard.util.Duration.milliseconds;
