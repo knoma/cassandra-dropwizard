@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/knoma/cass-dropwizard.svg?branch=Cassandra4)](https://travis-ci.com/knoma/cass-dropwizard)
 # REST Webservice using Dropwizard and Cassandra
-Simple REST Webservice using Dropwizard 2.0 and Cassandra Driver 4.2
+Simple REST Webservice using Dropwizard 4.0 beta and Cassandra Driver 4.15
 
 ###Requirements 
  - Cassandra 
@@ -19,7 +19,7 @@ Build app via gradle
 
 Start service via the fat jar
 ```shell script
-java -jar build/libs/cass-dropwizard-rest.jar server config.yml
+java -jar build/libs/cass-dropwizard-all.jar server config.yml
 ```
 
 Check health of the service 
@@ -43,7 +43,7 @@ curl -v "localhost:9000/person/all"
 ```
 Query count
 ```shell script
-curl -v  "localhost:9000/person/all"
+curl -v  "localhost:9000/person/count"
 ```
 
 DELETE data

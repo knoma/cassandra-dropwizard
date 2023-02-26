@@ -19,6 +19,7 @@ plugins {
     id "com.github.ben-manes.versions" version "$benManesVersion"
 }
 
+
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
@@ -69,8 +70,6 @@ shadowJar {
         attributes 'Created-By': 'Gradle ' + gradle.gradleVersion
         attributes 'Main-Class': mainClassName
     }
-
-    archiveName 'cass-dropwizard-rest.jar'
 }
 
 jar.enabled = false
@@ -82,8 +81,6 @@ run {
 test {
     useJUnitPlatform()
 }
-
-//build.dependsOn(shadowJar)
 
 project.tasks.assemble.dependsOn project.tasks.shadowJar
 
