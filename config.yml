@@ -11,6 +11,7 @@ server:
 health:
   delayedShutdownHandlerEnabled: true
   shutdownWaitPeriod: 5s
+  healthCheckUrlPaths: ["/healthcheck"]
   healthChecks:
     - name: cassandra
       critical: true
