@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/knoma/cass-dropwizard.svg?branch=Cassandra4)](https://travis-ci.com/knoma/cass-dropwizard)
+[![Build Status](https://travis-ci.com/knoma/cassandra-dropwizard.svg?branch=Cassandra4)](https://travis-ci.com/knoma/cassandra-dropwizard)
 # REST Webservice using Dropwizard and Cassandra
 Simple REST Webservice using Dropwizard 4.0 beta and Cassandra Driver 4.15
 
@@ -19,7 +19,7 @@ Build app via gradle
 
 Start service via the fat jar
 ```shell script
-java -jar build/libs/cass-dropwizard-all.jar server config.yml
+java -jar build/libs/cassandra-dropwizard-all.jar server config.yml
 ```
 
 Check health of the service 

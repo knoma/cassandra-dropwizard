@@ -4,14 +4,14 @@ ARG DEPLOY_HOME="/opt/app"
 
 ENV DEPLOY_HOME=$DEPLOY_HOME
 ENV APP_JVM_OPTIONS="-Xms128mb -Xmx128mb -XX:+DisableExplicitGC"
-ENV APP_JAR=cass-dropwizard-rest.jar
+ENV APP_JAR=cassandra-dropwizard-rest.jar
 
 
 # Make deployment directory
 RUN mkdir -p -m 775 $DEPLOY_HOME
 
 #Copy jar
-COPY build/libs/cass-dropwizard-rest.jar $DEPLOY_HOME/cass-dropwizard-rest.jar
+COPY build/libs/cassandra-dropwizard-rest.jar $DEPLOY_HOME/cassandra-dropwizard-rest.jar
 
 
 #Copy config yaml
