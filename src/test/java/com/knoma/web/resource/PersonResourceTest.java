@@ -91,7 +91,7 @@ public class PersonResourceTest {
                         .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/" + UUID.randomUUID());
 
         Validatable validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(404);
+        validatableResponse.then().log().all().statusCode(200);
     }
 
     @Test

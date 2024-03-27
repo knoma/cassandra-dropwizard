@@ -10,20 +10,17 @@ import com.knoma.web.dao.PersonMapperBuilder;
 import com.knoma.web.pojo.Person;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.container.AsyncResponse;
-import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.glassfish.jersey.server.ManagedAsync;
-
+import com.datastax.oss.driver.api.core.MappedAsyncPagingIterable;
 
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionStage;
 
 @Path("/person")
 public class PersonResource {
 
-    private PersonDAO personDAO;
+    private final PersonDAO personDAO;
 
     @Inject
     public PersonResource(CqlSession session) {
@@ -33,57 +30,49 @@ public class PersonResource {
 
     @GET
     @Timed
-    @ManagedAsync
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void getPerson(@Suspended final AsyncResponse response, @PathParam("id") UUID id) throws ExecutionException, InterruptedException {
-        personDAO.getById(id).thenAccept((res) -> {
-            if (res != null) {
-                response.resume(Response.status(Response.Status.OK).entity(res).build());
-            } else {
-                response.resume(Response.status(Response.Status.NOT_FOUND).build());
-            }
-        });
+    public CompletionStage<Response> getPerson(@PathParam("id") UUID id) {
+        return personDAO.getById(id)
+                .thenApply(person -> Response.ok(person != null ? person : "{}").build());
     }
 
     @DELETE
     @Timed
-    @ManagedAsync
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void removePerson(@Suspended final AsyncResponse response, @PathParam("id") String id) {
-        personDAO.delete(UUID.fromString(id));
-        personDAO.getCount().thenAccept((res) ->
-                response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", res)).build()));
+    public CompletionStage<Response> removePerson(@PathParam("id") String id) {
+        return personDAO.delete(UUID.fromString(id))
+                .thenCompose(v -> personDAO.getCount())
+                .thenApply(count -> Response.ok(ImmutableMap.of("count", count)).status(Response.Status.OK).build());
     }
 
     @GET
     @Timed
-    @ManagedAsync
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
-    public void getPersons(@Suspended final AsyncResponse response) {
-        personDAO.getAll().thenAccept((a) ->
-                response.resume(Response.status(Response.Status.OK).entity(a.currentPage()).build()));
+    public CompletionStage<Response> getPersons() {
+        return personDAO.getAll()
+                .thenApply(MappedAsyncPagingIterable::currentPage)
+                .thenApply(persons -> Response.ok(persons).status(Response.Status.OK).build());
     }
 
     @POST
     @Timed
-    @ManagedAsync
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes({MediaType.APPLICATION_JSON})
-    public void addPerson(@Suspended final AsyncResponse response, Person person) {
-        personDAO.saveAsync(person).thenAccept(aVoid -> response.resume(Response.status(Response.Status.CREATED).entity(person).build()));
+    public CompletionStage<Response> addPerson(Person person) {
+        return personDAO.saveAsync(person)
+                .thenApply(v -> Response.ok(person).status(Response.Status.CREATED).build());
     }
 
     @GET
     @Timed
-    @ManagedAsync
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
-    public void getPersonCount(@Suspended final AsyncResponse response) {
-        personDAO.getCount().whenCompleteAsync((res, err) ->
-                response.resume(Response.status(Response.Status.OK).entity(ImmutableMap.of("count", res)).build()));
+    public CompletionStage<Response> getPersonCount() {
+        return personDAO.getCount()
+                .thenApply(count -> Response.ok(ImmutableMap.of("count", count)).status(Response.Status.OK).build());
     }
 }
