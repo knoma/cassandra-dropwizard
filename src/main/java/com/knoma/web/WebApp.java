@@ -16,9 +16,9 @@ import static io.dropwizard.util.Duration.milliseconds;
 
 public class WebApp extends Application<WebConfig> {
 
-    protected String validationQuery = "SELECT key FROM system.local;";
+    protected final String validationQuery = "SELECT key FROM system.local;";
 
-    private CqlSession session = CqlSession.builder().build();
+    private final CqlSession session = CqlSession.builder().build();
 
     public static void main(String[] args) throws Exception {
         new WebApp().run(args);
