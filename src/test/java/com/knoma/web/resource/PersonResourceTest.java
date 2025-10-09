@@ -150,7 +150,8 @@ public class PersonResourceTest {
         validatableResponse = (Validatable) getRes;
         validatableResponse.then().log().all().statusCode(200);
 
-        Map<String, Integer> map = getRes.getBody().as(Map.class);
+        Map<String, Integer> map = getRes.getBody().as(new io.restassured.common.mapper.TypeRef<Map<String, Integer>>() {});
+
         assertThat(map.get("count"), greaterThan(1));
     }
 }

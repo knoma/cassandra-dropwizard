@@ -8,16 +8,16 @@ plugins {
     java
     application
     groovy
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    id("com.gradleup.shadow") version "9.2.2"
+    id("com.github.ben-manes.versions") version "0.53.0"
 }
 
 repositories {
     mavenCentral()
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_25
+java.targetCompatibility = JavaVersion.VERSION_25
 
 
 val buildTime = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
@@ -30,10 +30,14 @@ dependencies {
     annotationProcessor("com.datastax.oss:java-driver-mapper-processor:${property("cassandraDriver")}")
     implementation("org.lz4:lz4-java:1.8.0")
     testImplementation("io.dropwizard:dropwizard-testing:${property("dropwizard")}")
-    testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation("org.hamcrest:hamcrest:${property("hamcrest")}")
     testImplementation("io.rest-assured:rest-assured:${property("restAssured")}")
-    testImplementation("org.junit.jupiter:junit-jupiter:${property("junit")}")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${property("junit")}")
+    testImplementation(platform("org.junit:junit-bom:${property("junit")}"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Add JUnit Vintage engine if you have JUnit 3 or 4 tests you want to run
+    // testRuntimeOnly("org.junit.vintage:junit-vintage-engine") // Uncomment if needed
 }
 
 application {
