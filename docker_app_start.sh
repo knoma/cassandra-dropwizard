@@ -1,9 +1,14 @@
 #!/bin/sh
-###################################################################################################################################
-# This script is used by the docker container to start the application inside the container. This will not start the application. #
-###################################################################################################################################
+# Fail on any error
+set -e
 
-env
+# Log the command being executed
+echo "Starting Dropwizard application..."
 
-java ${APP_JVM_OPTIONS} \
-    -jar ${APP_JAR} server config.yml
+# Execute the Java application
+# $APP_JVM_OPTIONS: "-Xms128M -Xmx128M -XX:+DisableExplicitGC"
+# $DEPLOY_HOME: "/opt/app"
+# $APP_JAR: "cassandra-dropwizard-all.jar"
+# Args: "server config.yml"
+
+exec java $APP_JVM_OPTIONS -jar $DEPLOY_HOME/$APP_JAR server $DEPLOY_HOME/config.yml

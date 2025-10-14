@@ -4,8 +4,9 @@ Simple REST Webservice using Dropwizard 4.0 beta and Cassandra Driver 4.15
 
 ###Requirements 
  - Cassandra 
- - Java 11
- - Curl 
+ - Java 25
+ - Curl
+ - Docker
  
 Apply keyspace and table from [cql folder](src/main/resources/cql/db.cql).
 ```shell script

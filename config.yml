@@ -8,12 +8,20 @@ server:
   adminConnectors:
     - type: http
       port: 9001
+cassandra:
+  type: basic
+  contactPoints:
+    - host: ${CASSANDRA_HOST:-localhost}
+      port: ${CASSANDRA_PORT:-9042}
+  loadBalancingPolicy:
+    type: default
+    localDataCenter: ${CASSANDRA_DC:-datacenter1}
 health:
   delayedShutdownHandlerEnabled: true
   shutdownWaitPeriod: 5s
   healthCheckUrlPaths: ["/healthcheck"]
   healthChecks:
-    - name: cassandra
+    - name: s0
       critical: true
       schedule:
         checkInterval: 2500ms

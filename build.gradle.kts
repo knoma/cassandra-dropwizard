@@ -25,7 +25,7 @@ val builtBy = InetAddress.getLocalHost().hostName
 
 dependencies {
     implementation("io.dropwizard:dropwizard-core:${property("dropwizard")}")
-    implementation("com.datastax.oss:java-driver-core:${property("cassandraDriver")}")
+    implementation("io.dropwizard.modules:dropwizard-cassandra:${property("dropwizardModule")}")
     implementation("com.datastax.oss:java-driver-mapper-runtime:${property("cassandraDriver")}")
     annotationProcessor("com.datastax.oss:java-driver-mapper-processor:${property("cassandraDriver")}")
     implementation("org.lz4:lz4-java:1.8.0")
@@ -53,6 +53,9 @@ tasks.withType<Test> {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer::class.java)
+
     mergeServiceFiles()
     exclude("META-INF/*.DSA", "META-INF/*.RSA", "META-INF/*.SF")
     manifest {

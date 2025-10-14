@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra
+    ports:
+      - "9041:9042"  # Expose internal CQL port 9042 on host 9041
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks:
+      - app-network
+
+  cassandra-init:
+    image: cassandra:latest
+    container_name: cassandra-init
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    environment:
+      CASSANDRA_HOST: cassandra
+      CASSANDRA_PORT: 9042
+    volumes:
+      - ./cassandra_init.sh:/init.sh:ro
+    entrypoint: ["sh", "-e", "/init.sh"]
+    networks:
+      - app-network
+
+  app:
+    build: .
+    container_name: dropwizard-app
+    depends_on:
+      cassandra-init:
+        condition: service_completed_successfully
+    environment:
+      CASSANDRA_HOST: cassandra
+      CASSANDRA_PORT: 9042
+      CASSANDRA_DC: datacenter1
+      APP_JVM_OPTIONS: -Xms128M -Xmx128M -XX:+DisableExplicitGC
+    ports:
+      - "9000:9000"  # HTTP port
+      - "9001:9001"  # Admin port
+    entrypoint: ["sh", "-x", "/opt/app/docker_app_start.sh"]
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

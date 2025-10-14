@@ -1,18 +1,16 @@
-FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk-11.0.11_9-slim
+FROM openjdk:25-jdk-slim
 
 ARG DEPLOY_HOME="/opt/app"
 
 ENV DEPLOY_HOME=$DEPLOY_HOME
-ENV APP_JVM_OPTIONS="-Xms128mb -Xmx128mb -XX:+DisableExplicitGC"
-ENV APP_JAR=cassandra-dropwizard-rest.jar
-
+ENV APP_JVM_OPTIONS="-Xms128M -Xmx128M -XX:+DisableExplicitGC"
+ENV APP_JAR=cassandra-dropwizard-all.jar
 
 # Make deployment directory
 RUN mkdir -p -m 775 $DEPLOY_HOME
 
 #Copy jar
-COPY build/libs/cassandra-dropwizard-rest.jar $DEPLOY_HOME/cassandra-dropwizard-rest.jar
-
+COPY build/libs/cassandra-dropwizard-all.jar $DEPLOY_HOME/cassandra-dropwizard-all.jar
 
 #Copy config yaml
 COPY config.yml $DEPLOY_HOME/config.yml
