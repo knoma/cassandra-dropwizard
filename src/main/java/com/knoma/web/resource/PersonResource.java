@@ -1,13 +1,8 @@
 package com.knoma.web.resource;
 
 import com.codahale.metrics.annotation.Timed;
-import com.datastax.oss.driver.api.core.CqlIdentifier;
-import com.datastax.oss.driver.api.core.CqlSession;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import com.knoma.web.dao.PersonDAO;
-import com.knoma.web.dao.PersonMapper;
-import com.knoma.web.dao.PersonMapperBuilder;
 import com.knoma.web.pojo.Person;
 
 import jakarta.ws.rs.*;
@@ -21,12 +16,11 @@ import java.util.concurrent.CompletionStage;
 @Path("/person")
 public class PersonResource {
 
-    private final PersonDAO personDAO;
+    private final PersonService personService;
 
     @Inject
-    public PersonResource(CqlSession session) {
-        PersonMapper personMapper = new PersonMapperBuilder(session).build();
-        this.personDAO = personMapper.personDao(CqlIdentifier.fromCql("cass_drop"));
+    public PersonResource(PersonService personService) {
+        this.personService = personService;
     }
 
     @GET
@@ -34,7 +28,7 @@ public class PersonResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public CompletionStage<Response> getPerson(@PathParam("id") UUID id) {
-        return personDAO.getById(id)
+        return personService.getById(id)
                 .thenApply(person -> Response.ok(person != null ? person : "{}").build());
     }
 
@@ -43,8 +37,8 @@ public class PersonResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public CompletionStage<Response> removePerson(@PathParam("id") String id) {
-        return personDAO.delete(UUID.fromString(id))
-                .thenCompose(v -> personDAO.getCount())
+        return personService.delete(UUID.fromString(id))
+                .thenCompose(v -> personService.getCount())
                 .thenApply(count -> Response.ok(ImmutableMap.of("count", count)).status(Response.Status.OK).build());
     }
 
@@ -53,7 +47,7 @@ public class PersonResource {
     @Path("/all")
     @Produces(MediaType.APPLICATION_JSON)
     public CompletionStage<Response> getPersons() {
-        return personDAO.getAll()
+        return personService.getAll()
                 .thenApply(MappedAsyncPagingIterable::currentPage)
                 .thenApply(persons -> Response.ok(persons).status(Response.Status.OK).build());
     }
@@ -64,7 +58,7 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes({MediaType.APPLICATION_JSON})
     public CompletionStage<Response> addPerson(Person person) {
-        return personDAO.saveAsync(person)
+        return personService.saveAsync(person)
                 .thenApply(v -> Response.ok(person).status(Response.Status.CREATED).build());
     }
 
@@ -73,7 +67,7 @@ public class PersonResource {
     @Path("/count")
     @Produces(MediaType.APPLICATION_JSON)
     public CompletionStage<Response> getPersonCount() {
-        return personDAO.getCount()
+        return personService.getCount()
                 .thenApply(count -> Response.ok(ImmutableMap.of("count", count)).status(Response.Status.OK).build());
     }
 }

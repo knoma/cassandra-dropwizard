@@ -12,6 +12,8 @@ import ru.vyarus.dropwizard.guice.GuiceBundle;
 
 public class WebApp extends Application<WebConfig> {
 
+    private GuiceBundle guiceBundle;
+
     public static void main(String[] args) throws Exception {
         new WebApp().run(args);
     }
@@ -43,10 +45,15 @@ public class WebApp extends Application<WebConfig> {
 
         bootstrap.addBundle(cassandraBundle);
 
-        bootstrap.addBundle(GuiceBundle.builder()
+        guiceBundle = GuiceBundle.builder()
                 .enableAutoConfig(getClass().getPackage().getName())
                 .modules(new MainModule(cassandraBundle))
-                .build());
+                .build();
 
+        bootstrap.addBundle(guiceBundle);
+    }
+
+    public GuiceBundle getGuiceBundle() {
+        return guiceBundle;
     }
 }

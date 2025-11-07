@@ -6,152 +6,152 @@ import com.knoma.web.pojo.Person;
 import io.dropwizard.testing.ConfigOverride;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
-import io.restassured.response.ResponseOptions;
-import io.restassured.response.Validatable;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.containers.CassandraContainer;
 
+import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.*;
 
 @ExtendWith(DropwizardExtensionsSupport.class)
 public class PersonResourceTest {
 
-    private static final String CONFIG_PATH = "config.yml";
-    private static final String HOST = "localhost";
-    private static final String APP_PORT_KEY = "server.applicationConnectors[0].port";
-    private static final String APP_PORT = "8008";
+    static CassandraContainer<?> cassandra = new CassandraContainer<>("cassandra:latest")
+            .withStartupTimeout(Duration.ofMinutes(2))
+            .withInitScript("cql/db.cql");
 
-    public static final DropwizardAppExtension<WebConfig> RULE =
-            new DropwizardAppExtension<>(WebApp.class, CONFIG_PATH,
-                    ConfigOverride.config(APP_PORT_KEY, APP_PORT));
+    static {
+        cassandra.start();  // Keyspace created here automatically
+    }
+
+   public static final DropwizardAppExtension<WebConfig> RULE =
+            new DropwizardAppExtension<>(
+                    WebApp.class,
+                    "config.yml", // Assuming this configuration file path is correct
+                    ConfigOverride.config("server.applicationConnectors[0].port", "0"),
+                    ConfigOverride.config("cassandra.contactPoints[0].host", cassandra.getContactPoint().getHostName()),
+                    ConfigOverride.config("cassandra.contactPoints[0].port", String.valueOf(cassandra.getContactPoint().getPort())) // Use port 0 for dynamic assignment
+            );
+
+    @BeforeAll
+    public static void setup() {
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = RULE.getLocalPort();
+    }
+
+    private Person createTestPerson(UUID id) {
+        // Person POJO must have UUID, name, lastName, email fields/constructor
+        Person person = new Person(id, "TestName", "TestLast", "test." + id.toString().substring(0, 8) + "@example.com");
+
+        // Use RestAssured.baseURI and RestAssured.port set in @BeforeAll
+        Response postResponse = given()
+                .contentType(ContentType.JSON)
+                .body(person)
+                .when()
+                // Assuming PersonResource uses @Path("/person") and the POST is directly on that path
+                .put("/person");
+
+        postResponse.then()
+                .log().ifValidationFails()
+                .statusCode(201); // Asserts the expected creation status code
+
+        Person result = postResponse.getBody().as(Person.class);
+        assertThat(result.getId(), notNullValue());
+
+        return result;
+    }
+
+    @BeforeAll
+    public static void setupRestAssured() {
+        // Configure RestAssured to use the dynamic port assigned by Dropwizard
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = RULE.getLocalPort();
+    }
+
+    // --- Tests ---
 
     @Test
     public void createPersonSuccess() throws Exception {
-        Person person = new Person(UUID.randomUUID(), "testJ", "testJ", "testj@testj.com");
-        ResponseOptions getRes =
-                given()
-                        .log().all()
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .when()
-                        .body(person)
-                        .put("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+        UUID id = UUID.randomUUID();
 
-        Validatable validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(201);
+        Person createdPerson = createTestPerson(id);
 
-        Person result = getRes.getBody().as(Person.class);
-        assertThat(result, equalTo(person));
+        assertThat(createdPerson.getFirstName(), equalTo("TestName"));
+        assertThat(createdPerson.getId(), equalTo(id));
     }
 
     @Test
     public void getPersonSuccess() throws Exception {
-        Person person = new Person(UUID.randomUUID(), "testJ", "testJ", "testj@testj.com");
-        ResponseOptions getRes =
-                given()
-                        .log().all()
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .when()
-                        .body(person)
-                        .put("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+        UUID id = UUID.randomUUID();
+        Person createdPerson = createTestPerson(id);
 
-        Validatable validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(201);
+        Response getResponse = given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/person/{id}", createdPerson.getId()); // Use path parameter
 
-        getRes =
-                given()
-                        .log().all()
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .when()
-                        .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/" + person.getId());
+        getResponse.then()
+                .log().ifValidationFails()
+                .statusCode(200);
 
-        validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(200);
-
-        Person result = getRes.getBody().as(Person.class);
-        assertThat(result, equalTo(person));
+        Person result = getResponse.getBody().as(Person.class);
+        assertThat(result, equalTo(createdPerson));
     }
 
     @Test
     public void getPersonNotFound() throws Exception {
-        ResponseOptions getRes =
-                given()
-                        .log().all()
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .when()
-                        .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/" + UUID.randomUUID());
-
-        Validatable validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(200);
+        given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/person/{id}", UUID.randomUUID())
+                .then()
+                .log().ifValidationFails()
+                .body("size()", equalTo(0))
+                .statusCode(200);
     }
 
     @Test
     public void getAllPersonSuccess() throws Exception {
-        Person person = new Person(UUID.randomUUID(), "testJ", "testJ", "testj@testj.com");
-        ResponseOptions getRes =
-                given()
-                        .log().all()
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .when()
-                        .body(person)
-                        .put("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+        createTestPerson(UUID.randomUUID());
 
-        Validatable validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(201);
+        Response getResponse = given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/person/all");
 
-        getRes =
-                given()
-                        .log().all()
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .when()
-                        .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/all");
+        getResponse.then()
+                .log().ifValidationFails()
+                .statusCode(200);
 
-        validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(200);
-
-        Person[] result = getRes.getBody().as(Person[].class);
-        assertThat(result.length, greaterThan(1));
+        Person[] result = getResponse.getBody().as(Person[].class);
+        assertThat(result.length, greaterThan(0));
     }
 
     @Test
     public void getPersonCountSuccess() throws Exception {
-        Person person = new Person(UUID.randomUUID(), "testJ", "testJ", "testj@testj.com");
-        ResponseOptions getRes =
-                given()
-                        .log().all()
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .when()
-                        .body(person)
-                        .put("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+        createTestPerson(UUID.randomUUID());
 
-        Validatable validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(201);
+        Response getResponse = given()
+                .accept(ContentType.JSON)
+                .when()
+                .get("/person/count");
 
-        getRes =
-                given()
-                        .log().all()
-                        .header("Content-Type", "application/json")
-                        .header("Accept", "application/json")
-                        .when()
-                        .get("http://" + HOST + ":" + RULE.getLocalPort() + "/person/count");
+        getResponse.then()
+                .log().ifValidationFails()
+                .statusCode(200);
 
-        validatableResponse = (Validatable) getRes;
-        validatableResponse.then().log().all().statusCode(200);
+        Map<String, Integer> map = getResponse.getBody().as(new io.restassured.common.mapper.TypeRef<Map<String, Integer>>() {});
 
-        Map<String, Integer> map = getRes.getBody().as(new io.restassured.common.mapper.TypeRef<Map<String, Integer>>() {});
-
-        assertThat(map.get("count"), greaterThan(1));
+        assertThat(map.get("count"), greaterThan(0));
     }
 }

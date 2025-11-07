@@ -4,6 +4,8 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.knoma.web.config.WebConfig;
+import com.knoma.web.resource.PersonResource;
+import com.knoma.web.resource.PersonService;
 import io.dropwizard.cassandra.CassandraBundle;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import ru.vyarus.dropwizard.guice.module.support.DropwizardAwareModule;

@@ -1,13 +1,18 @@
 package com.knoma.web.pojo;
 
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
+import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
+import com.datastax.oss.driver.api.mapper.annotations.PropertyStrategy;
+import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
+@PropertyStrategy(mutable = false)
+@NamingStrategy(convention = NamingConvention.SNAKE_CASE_INSENSITIVE)
 public class Person {
 
     @PartitionKey
