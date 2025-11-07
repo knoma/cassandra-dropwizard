@@ -4,11 +4,12 @@ import com.codahale.metrics.annotation.Timed;
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import com.knoma.web.dao.PersonDAO;
 import com.knoma.web.dao.PersonMapper;
 import com.knoma.web.dao.PersonMapperBuilder;
 import com.knoma.web.pojo.Person;
-import jakarta.inject.Inject;
+
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -57,7 +58,7 @@ public class PersonResource {
                 .thenApply(persons -> Response.ok(persons).status(Response.Status.OK).build());
     }
 
-    @POST
+    @PUT
     @Timed
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)

@@ -30,7 +30,7 @@ curl http://localhost:9000/health-check
 
 Create data via curl
 ```shell script
-curl -v  -XPOST "localhost:9000/person" -H "Content-Type: application/json" -d '{"id": "66992983-af17-43ad-9fc9-b9a654a42d36", "firstName": "how", "lastName": "Ilove", "email": "jss@test.de"}'
+curl -v  -XPUT "localhost:9000/person" -H "Content-Type: application/json" -d '{"id": "66992983-af17-43ad-9fc9-b9a654a42d36", "firstName": "how", "lastName": "Ilove", "email": "jss@test.de"}'
 ```
 
 Query single person

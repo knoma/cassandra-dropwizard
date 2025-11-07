@@ -29,6 +29,9 @@ dependencies {
     implementation("com.datastax.oss:java-driver-mapper-runtime:${property("cassandraDriver")}")
     annotationProcessor("com.datastax.oss:java-driver-mapper-processor:${property("cassandraDriver")}")
     implementation("org.lz4:lz4-java:1.8.0")
+    implementation(platform("ru.vyarus.guicey:guicey-bom:8.0.0"))
+
+    implementation ("ru.vyarus:dropwizard-guicey")
     testImplementation("io.dropwizard:dropwizard-testing:${property("dropwizard")}")
     testImplementation("org.hamcrest:hamcrest:${property("hamcrest")}")
     testImplementation("io.rest-assured:rest-assured:${property("restAssured")}")
