@@ -60,7 +60,7 @@ public class PersonResourceTest {
                         .header("Accept", "application/json")
                         .when()
                         .body(person)
-                        .post("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+                        .put("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
 
         Validatable validatableResponse = (Validatable) getRes;
         validatableResponse.then().log().all().statusCode(201);
@@ -104,7 +104,7 @@ public class PersonResourceTest {
                         .header("Accept", "application/json")
                         .when()
                         .body(person)
-                        .post("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+                        .put("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
 
         Validatable validatableResponse = (Validatable) getRes;
         validatableResponse.then().log().all().statusCode(201);
@@ -134,7 +134,7 @@ public class PersonResourceTest {
                         .header("Accept", "application/json")
                         .when()
                         .body(person)
-                        .post("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
+                        .put("http://" + HOST + ":" + RULE.getLocalPort() + "/person/");
 
         Validatable validatableResponse = (Validatable) getRes;
         validatableResponse.then().log().all().statusCode(201);
