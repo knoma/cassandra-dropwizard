@@ -7,13 +7,12 @@ import com.datastax.oss.driver.api.mapper.annotations.PropertyStrategy;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @PropertyStrategy(mutable = false)
 @NamingStrategy(convention = NamingConvention.SNAKE_CASE_INSENSITIVE)
-public class Person {
+public final class Person {
 
     @PartitionKey
     private UUID id;
@@ -31,55 +30,8 @@ public class Person {
         this.email = email;
     }
 
-    @JsonProperty
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    @JsonProperty
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    @JsonProperty
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    @JsonProperty
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Person)) return false;
-        Person person = (Person) o;
-        return getId().equals(person.getId()) &&
-                Objects.equals(getFirstName(), person.getFirstName()) &&
-                Objects.equals(getLastName(), person.getLastName()) &&
-                Objects.equals(getEmail(), person.getEmail());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getFirstName(), getLastName(), getEmail());
-    }
+    @JsonProperty public UUID getId() { return id; }
+    @JsonProperty public String getFirstName() { return firstName; }
+    @JsonProperty public String getLastName() { return lastName; }
+    @JsonProperty public String getEmail() { return email; }
 }

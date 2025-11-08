@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.containers.CassandraContainer;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -102,10 +101,11 @@ public class PersonResourceTest {
 
         getResponse.then()
                 .log().ifValidationFails()
+                .body("id", equalTo(createdPerson.getId().toString()))
+                .body("firstName", equalTo(createdPerson.getFirstName()))
+                .body("lastName", equalTo(createdPerson.getLastName()))
+                .body("email", equalTo(createdPerson.getEmail()))
                 .statusCode(200);
-
-        Person result = getResponse.getBody().as(Person.class);
-        assertThat(result, equalTo(createdPerson));
     }
 
     @Test

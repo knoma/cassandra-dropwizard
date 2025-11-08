@@ -38,7 +38,7 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:${property("junit")}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.testcontainers:cassandra:1.19.7")
+    testImplementation("org.testcontainers:cassandra:${property("testContainerCassandra")}")
 
     // Add JUnit Vintage engine if you have JUnit 3 or 4 tests you want to run
     // testRuntimeOnly("org.junit.vintage:junit-vintage-engine") // Uncomment if needed
